@@ -1,4 +1,4 @@
-module github.com/MalavikaS2000/Golang-poc/FitnessTrackerApplication/backend
+module github.com/Malavika230/fitness-tracker-application/backend
 
 go 1.22.3
 

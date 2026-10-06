@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/MalavikaS2000/Golang-poc/FitnessTrackerApplication/backend/database"
-	"github.com/MalavikaS2000/Golang-poc/FitnessTrackerApplication/backend/models"
+	"github.com/Malavika230/fitness-tracker-application/backend/database"
+	"github.com/Malavika230/fitness-tracker-application/backend/models"
 	"github.com/gofiber/fiber/v2"
 )
 

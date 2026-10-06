@@ -1,26 +1,36 @@
 package controllers
 
 import (
+	"os"
 	"strconv"
 	"time"
 
-	"github.com/MalavikaS2000/Golang-poc/FitnessTrackerApplication/backend/database"
-	"github.com/MalavikaS2000/Golang-poc/FitnessTrackerApplication/backend/models"
+	"github.com/Malavika230/fitness-tracker-application/backend/database"
+	"github.com/Malavika230/fitness-tracker-application/backend/models"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 )
 
-const SecretKey = "secret"
+func getSecretKey() string {
+	return os.Getenv("JWT_SECRET")
+}
 
 func Signup(c *fiber.Ctx) error {
 	var data map[string]string
 
 	if err := c.BodyParser(&data); err != nil {
-		return err
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "invalid request body",
+		})
 	}
 
-	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
+	password, err := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "could not hash password",
+		})
+	}
 
 	user := models.User{
 		FullName: data["fullname"],
@@ -28,7 +38,11 @@ func Signup(c *fiber.Ctx) error {
 		Password: string(password),
 	}
 
-	database.DB.Create(&user)
+	if err := database.DB.Create(&user).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "could not create user",
+		})
+	}
 
 	return c.JSON(user)
 }
@@ -37,25 +51,34 @@ func Login(c *fiber.Ctx) error {
 	var data map[string]string
 
 	if err := c.BodyParser(&data); err != nil {
-		return err
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "invalid request body",
+		})
 	}
 
 	var user models.User
 
-	database.DB.Where("email =?", data["email"]).First(&user)
-
-	if user.UserID == 0 {
-		c.Status(fiber.StatusNotFound)
-		return c.JSON(fiber.Map{
+	if err := database.DB.Where("email = ?", data["email"]).First(&user).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "user not found",
 		})
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data["password"])); err != nil {
-		c.Status(fiber.StatusBadRequest)
-		return c.JSON((fiber.Map{
+	if err := bcrypt.CompareHashAndPassword(
+		[]byte(user.Password),
+		[]byte(data["password"]),
+	); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "incorrect password",
-		}))
+		})
+	}
+
+	secretKey := getSecretKey()
+
+	if secretKey == "" {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "JWT secret is not configured",
+		})
 	}
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
@@ -63,11 +86,9 @@ func Login(c *fiber.Ctx) error {
 		ExpiresAt: time.Now().Add(24 * time.Hour).Unix(),
 	})
 
-	token, err := claims.SignedString([]byte(SecretKey))
-
+	token, err := claims.SignedString([]byte(secretKey))
 	if err != nil {
-		c.Status(fiber.StatusInternalServerError)
-		return c.JSON(fiber.Map{
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "could not login",
 		})
 	}
@@ -75,11 +96,12 @@ func Login(c *fiber.Ctx) error {
 	cookie := fiber.Cookie{
 		Name:     "jwt",
 		Value:    token,
-		Expires:  time.Now().Add(time.Hour * 24),
+		Expires:  time.Now().Add(24 * time.Hour),
 		HTTPOnly: true,
 	}
 
 	c.Cookie(&cookie)
+
 	return c.JSON(fiber.Map{
 		"message": "success",
 	})
@@ -88,29 +110,53 @@ func Login(c *fiber.Ctx) error {
 func User(c *fiber.Ctx) error {
 	cookie := c.Cookies("jwt")
 
-	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(SecretKey), nil
-	})
-
-	if err != nil {
-		c.Status(fiber.StatusUnauthorized)
-		return c.JSON(fiber.Map{
+	if cookie == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"message": "unauthenticated",
 		})
 	}
 
-	claims := token.Claims.(*jwt.StandardClaims)
+	secretKey := getSecretKey()
+
+	if secretKey == "" {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "JWT secret is not configured",
+		})
+	}
+
+	token, err := jwt.ParseWithClaims(
+		cookie,
+		&jwt.StandardClaims{},
+		func(token *jwt.Token) (interface{}, error) {
+			return []byte(secretKey), nil
+		},
+	)
+
+	if err != nil || !token.Valid {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "unauthenticated",
+		})
+	}
+
+	claims, ok := token.Claims.(*jwt.StandardClaims)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "invalid token",
+		})
+	}
 
 	var user models.User
 
-	database.DB.Where("user_id=?", claims.Issuer).First(&user)
+	if err := database.DB.Where("user_id = ?", claims.Issuer).First(&user).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "user not found",
+		})
+	}
 
 	return c.JSON(user)
-
 }
 
 func Logout(c *fiber.Ctx) error {
-
 	cookie := fiber.Cookie{
 		Name:     "jwt",
 		Value:    "",
@@ -123,14 +169,13 @@ func Logout(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"message": "success",
 	})
-
 }
 
 func UserUpdate(c *fiber.Ctx) error {
-
 	userID := c.Params("id")
 
 	var data map[string]string
+
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "cannot parse JSON",
@@ -138,6 +183,7 @@ func UserUpdate(c *fiber.Ctx) error {
 	}
 
 	newFullname, ok := data["fullname"]
+
 	if !ok || newFullname == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "fullname is required",
@@ -145,6 +191,7 @@ func UserUpdate(c *fiber.Ctx) error {
 	}
 
 	var user models.User
+
 	if err := database.DB.First(&user, userID).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "user not found",
@@ -152,6 +199,7 @@ func UserUpdate(c *fiber.Ctx) error {
 	}
 
 	user.FullName = newFullname
+
 	if err := database.DB.Save(&user).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "could not update fullname",

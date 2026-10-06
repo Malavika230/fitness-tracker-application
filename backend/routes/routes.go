@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/MalavikaS2000/Golang-poc/FitnessTrackerApplication/backend/controllers"
+	"github.com/Malavika230/fitness-tracker-application/backend/controllers"
 	"github.com/gofiber/fiber/v2"
 )
 

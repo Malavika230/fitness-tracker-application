@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/MalavikaS2000/Golang-poc/FitnessTrackerApplication/backend/database"
-	"github.com/MalavikaS2000/Golang-poc/FitnessTrackerApplication/backend/routes"
+	"github.com/Malavika230/fitness-tracker-application/backend/database"
+	"github.com/Malavika230/fitness-tracker-application/backend/routes"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )

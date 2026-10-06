@@ -1,106 +1,175 @@
 # Fitness Tracker Application
 
-Personal learning project created on 2024-06-24.
+A personal full-stack learning project built with **Go, Fiber, React, and MySQL**.
 
-A full-stack fitness tracker with a Go Fiber backend and a React frontend. The application allows users to sign up, log in, view their profile, add workout activity entries, and navigate through dashboard-style pages for home, goals, achievements, and activity tracking.
+The Fitness Tracker application allows users to create an account, log in, view and update their profile, record workout activities, and navigate through dashboard-style pages for home, goals, achievements, and activity tracking.
 
-## Overview
+> **Project status:** Learning project. Some features, including Goals and Achievements, are currently UI/demo implementations without backend persistence.
 
-This project is split into two main parts:
-
-- Backend: Go API using Fiber, GORM, MySQL, JWT authentication, and bcrypt password hashing
-- Frontend: React app using React Router and Bootstrap styling
-
-The frontend communicates with the backend on localhost:8000, while the app itself is served from localhost:3000.
-
-## Architecture
-
-### Backend
-
-The backend is located in the [backend](backend) directory and is built around a simple layered structure:
-
-- [main.go](backend/main.go): Starts the Fiber app, enables CORS for http://localhost:3000, and listens on port 8000.
-- [routes/routes.go](backend/routes/routes.go): Defines API endpoints for authentication and activity management.
-- [controllers/authController.go](backend/controllers/authController.go): Handles signup, login, user lookup, logout, and user update flows.
-- [controllers/activityController.go](backend/controllers/activityController.go): Handles adding activities and fetching activities by user.
-- [models/user.go](backend/models/user.go): Defines the User and Activity data models.
-- [database/connection.go](backend/database/connection.go): Loads environment variables and opens a MySQL connection using GORM.
-
-### Frontend
-
-The frontend is located in the [frontend](frontend) directory and uses a React/React Router layout:
-
-- [frontend/src/App.js](frontend/src/App.js): Sets up all application routes.
-- [frontend/src/components/Login/Login.js](frontend/src/components/Login/Login.js): Login page with email/password validation.
-- [frontend/src/components/Signup/Signup.js](frontend/src/components/Signup/Signup.js): Registration form with validation.
-- [frontend/src/components/Home/Home.js](frontend/src/components/Home/Home.js): Displays a welcome message with the currently logged-in user.
-- [frontend/src/components/Activity/Activity.js](frontend/src/components/Activity/Activity.js): Fetches and displays activities for the current user and allows adding a new activity.
-- [frontend/src/components/Goals/Goals.js](frontend/src/components/Goals/Goals.js): Goal-setting UI scaffold with a modal form and static sample goal card.
-- [frontend/src/components/Achivements/Achivements.js](frontend/src/components/Achivements/Achivements.js): Achievement view with a static card example.
-- [frontend/src/components/Profile/Profiles.js](frontend/src/components/Profile/Profiles.js): Profile page showing user details and fullname update flow.
-- [frontend/src/components/Navbar/Navbar.js](frontend/src/components/Navbar/Navbar.js): Shared navigation and logout button.
+---
 
 ## Features
 
-### Authentication and user management
+### Authentication & User Management
 
-The backend implements these user-related endpoints:
+* User registration with fullname, email, and password
+* Password hashing using bcrypt
+* User login with JWT authentication
+* JWT stored in an HTTP-only cookie
+* Authenticated user lookup
+* User logout
+* User fullname update
+* Frontend form validation
 
-- POST /api/signup
-  - Creates a new user record
-  - Hashes the password using bcrypt
-- POST /api/login
-  - Validates email/password
-  - Generates a JWT and sets it in a cookie named jwt
-- GET /api/user
-  - Reads the JWT from the cookie and returns the current user
-- POST /api/logout
-  - Clears the jwt cookie
-- PUT /api/updateUser/:id
-  - Updates the user fullname for the given user ID
+### Activity Tracking
 
-### Activity tracking
+* Add workout/activity entries
+* Retrieve activities for a user
+* Display activity history
+* Add activities through a modal form
 
-- POST /api/addActivity
-  - Creates a new activity record
-- GET /api/getActivity/:id
-  - Returns all activities for a given user ID
+### Dashboard
 
-The frontend supports:
+* Home page with logged-in user information
+* Activity tracking page
+* Goals page
+* Achievements page
+* Profile page
+* Shared navigation bar
+* Logout functionality
 
-- login with email and password validation
-- signup with fullname, email, password, and confirm password validation
-- navigation between Home, Activities, Goals, Achievements, and Profile
-- fetching the authenticated user and their activity log
-- saving a new activity using a modal form
-- updating the user's fullname from the profile page
+> **Note:** Goals and Achievements are currently static/demo screens and do not yet have corresponding backend APIs or database persistence.
+
+---
 
 ## Tech Stack
 
 ### Backend
 
-- Go 1.22.3
-- Fiber v2
-- GORM
-- MySQL driver
-- JWT (dgrijalva/jwt-go)
-- bcrypt via golang.org/x/crypto/bcrypt
-- godotenv for environment configuration
+* **Go 1.22.3**
+* **Fiber v2** — HTTP framework
+* **GORM** — ORM
+* **MySQL** — Database
+* **JWT** — Authentication
+* **bcrypt** — Password hashing
+* **godotenv** — Environment variable loading
 
 ### Frontend
 
-- React 18
-- React Router DOM
-- Bootstrap
-- React Bootstrap
-- Axios
-- Validator.js
-- date-fns
-- react-icons
+* **React 18**
+* **React Router DOM**
+* **Axios**
+* **Bootstrap**
+* **React Bootstrap**
+* **Validator.js**
+* **date-fns**
+* **react-icons**
+
+---
+
+## Architecture
+
+The application is split into two main parts:
+
+```text
+┌──────────────────────┐
+│    React Frontend    │
+│   localhost:3000     │
+└──────────┬───────────┘
+           │
+           │ HTTP / Axios
+           ▼
+┌──────────────────────┐
+│    Go + Fiber API    │
+│   localhost:8000     │
+└──────────┬───────────┘
+           │
+           │ GORM
+           ▼
+┌──────────────────────┐
+│    MySQL Database    │
+│      fitnessdb       │
+└──────────────────────┘
+```
+
+The frontend communicates with the backend through HTTP requests using Axios.
+
+Authenticated requests use the JWT stored in the `jwt` HTTP-only cookie.
+
+---
+
+## Backend
+
+The backend is located in the [`backend`](backend) directory.
+
+### Main Files
+
+* [`backend/main.go`](backend/main.go) — Creates and starts the Fiber application, configures CORS, and listens on port `8000`.
+* [`backend/routes/routes.go`](backend/routes/routes.go) — Defines API routes for authentication and activity management.
+* [`backend/controllers/authController.go`](backend/controllers/authController.go) — Handles signup, login, user lookup, logout, and user updates.
+* [`backend/controllers/activityController.go`](backend/controllers/activityController.go) — Handles creating and retrieving activity records.
+* [`backend/models/user.go`](backend/models/user.go) — Defines the User and Activity data models.
+* [`backend/database/connection.go`](backend/database/connection.go) — Loads environment variables and establishes the MySQL connection using GORM.
+
+---
+
+## Frontend
+
+The frontend is located in the [`frontend`](frontend) directory.
+
+### Main Components
+
+* [`frontend/src/App.js`](frontend/src/App.js) — Defines the application's routes.
+* [`frontend/src/components/Login/Login.js`](frontend/src/components/Login/Login.js) — Login form with email and password validation.
+* [`frontend/src/components/Signup/Signup.js`](frontend/src/components/Signup/Signup.js) — Registration form with fullname, email, password, and confirmation validation.
+* [`frontend/src/components/Home/Home.js`](frontend/src/components/Home/Home.js) — Displays a welcome message for the logged-in user.
+* [`frontend/src/components/Activity/Activity.js`](frontend/src/components/Activity/Activity.js) — Fetches and displays user activities and allows new activities to be added.
+* [`frontend/src/components/Goals/Goals.js`](frontend/src/components/Goals/Goals.js) — Goal-setting UI with a modal form and sample goal content.
+* [`frontend/src/components/Achievements/Achievements.js`](frontend/src/components/Achievements/Achievements.js) — Displays achievement information using static/demo content.
+* [`frontend/src/components/Profile/Profiles.js`](frontend/src/components/Profile/Profiles.js) — Displays user details and provides fullname update functionality.
+* [`frontend/src/components/Navbar/Navbar.js`](frontend/src/components/Navbar/Navbar.js) — Shared navigation and logout functionality.
+
+---
+
+## API Endpoints
+
+### Authentication & User Management
+
+| Method | Endpoint              | Description                                    |
+| ------ | --------------------- | ---------------------------------------------- |
+| `POST` | `/api/signup`         | Creates a new user and hashes the password     |
+| `POST` | `/api/login`          | Validates credentials and creates a JWT cookie |
+| `GET`  | `/api/user`           | Returns the currently authenticated user       |
+| `POST` | `/api/logout`         | Clears the JWT cookie                          |
+| `PUT`  | `/api/updateUser/:id` | Updates the user's fullname                    |
+
+### Activity Tracking
+
+| Method | Endpoint               | Description                     |
+| ------ | ---------------------- | ------------------------------- |
+| `POST` | `/api/addActivity`     | Creates a new activity record   |
+| `GET`  | `/api/getActivity/:id` | Retrieves activities for a user |
+
+---
+
+## Prerequisites
+
+Before running the application, make sure you have the following installed:
+
+* [Go](https://go.dev/) 1.22 or later
+* [Node.js](https://nodejs.org/) and npm
+* [MySQL](https://www.mysql.com/)
+* Git
+
+---
 
 ## Environment Variables
 
-The backend expects a .env file in the [backend](backend) directory. The template is provided in [backend/.env.example](backend/.env.example):
+The backend uses environment variables for database and JWT configuration.
+
+Create a `.env` file inside the [`backend`](backend) directory.
+
+A template is provided in [`backend/.env.example`](backend/.env.example):
 
 ```env
 DB_USER=root
@@ -108,33 +177,166 @@ DB_PASSWORD=your_password_here
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_NAME=fitnessdb
+JWT_SECRET=your_long_random_secret_here
 ```
 
-The actual project environment file present in the repository is [backend/.env](backend/.env), which currently contains:
+### Environment Variable Reference
 
-```env
-DB_USER=root
-DB_PASSWORD=Master#123
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_NAME=fitnessdb
+| Variable      | Description                    |
+| ------------- | ------------------------------ |
+| `DB_USER`     | MySQL username                 |
+| `DB_PASSWORD` | MySQL password                 |
+| `DB_HOST`     | MySQL host                     |
+| `DB_PORT`     | MySQL port                     |
+| `DB_NAME`     | MySQL database name            |
+| `JWT_SECRET`  | Secret used to sign JWT tokens |
+
+> **Security:** Never commit your `.env` file or real credentials to Git. Make sure `.env` is included in `.gitignore`.
+
+---
+
+## Database Setup
+
+The application uses MySQL with GORM.
+
+Create the database before starting the backend:
+
+```sql
+CREATE DATABASE fitnessdb;
 ```
 
-The backend also uses a hard-coded JWT secret in [backend/controllers/authController.go](backend/controllers/authController.go):
+The database connection is configured in [`backend/database/connection.go`](backend/database/connection.go).
+
+The connection string follows this format:
+
+```text
+%s:%s@tcp(%s:%s)/%s?parseTime=true
+```
+
+The values are populated from the environment variables defined in `.env`.
+
+---
+
+## Running the Project
+
+### 1. Start MySQL
+
+Make sure your MySQL server is running and that the `fitnessdb` database exists.
+
+---
+
+### 2. Start the Backend
+
+Open a terminal and navigate to the backend directory:
+
+```bash
+cd backend
+```
+
+Download the Go dependencies:
+
+```bash
+go mod download
+```
+
+Start the backend:
+
+```bash
+go run main.go
+```
+
+The backend API will be available at:
+
+```text
+http://localhost:8000
+```
+
+---
+
+### 3. Start the Frontend
+
+Open another terminal and navigate to the frontend directory:
+
+```bash
+cd frontend
+```
+
+Install the dependencies:
+
+```bash
+npm install
+```
+
+Start the React application:
+
+```bash
+npm start
+```
+
+The frontend will be available at:
+
+```text
+http://localhost:3000
+```
+
+---
+
+## Authentication
+
+Authentication uses **JWT (JSON Web Tokens)** stored in an HTTP-only cookie named `jwt`.
+
+The login flow works as follows:
+
+```text
+User
+ │
+ │ Email + Password
+ ▼
+React Frontend
+ │
+ │ POST /api/login
+ ▼
+Go/Fiber Backend
+ │
+ │ Validate credentials
+ │
+ │ Generate JWT
+ ▼
+HTTP-only Cookie
+ │
+ │ Authenticated requests
+ ▼
+Backend API
+```
+
+The JWT signing secret is loaded from the `JWT_SECRET` environment variable.
+
+The frontend uses Axios with credentials enabled for authenticated requests.
+
+For example:
+
+```javascript
+axios.get("http://localhost:8000/api/user", {
+  withCredentials: true
+});
+```
+
+---
+
+## CORS Configuration
+
+The backend is configured to accept requests from the local React frontend:
 
 ```go
-const SecretKey = "secret"
+app.Use(cors.New(cors.Config{
+    AllowOrigins:     "http://localhost:3000",
+    AllowCredentials: true,
+}))
 ```
 
-## Database
+This allows the frontend running on port `3000` to communicate with the backend running on port `8000`.
 
-The project uses MySQL with GORM. The connection string is built in [backend/database/connection.go](backend/database/connection.go) using the values from the environment variables:
-
-```go
-"%s:%s@tcp(%s:%s)/%s?parseTime=true"
-```
-
-The database name configured in the project is fitnessdb.
+---
 
 ## Project Structure
 
@@ -143,7 +345,6 @@ fitness-tracker-application/
 ├── .gitignore
 ├── README.md
 ├── backend/
-│   ├── .env
 │   ├── .env.example
 │   ├── controllers/
 │   │   ├── activityController.go
@@ -164,45 +365,81 @@ fitness-tracker-application/
         ├── App.js
         ├── App.css
         ├── components/
+        │   ├── Activity/
+        │   ├── Achievements/
+        │   ├── Goals/
+        │   ├── Home/
+        │   ├── Login/
+        │   ├── Navbar/
+        │   ├── Profile/
+        │   └── Signup/
         ├── index.css
         └── index.js
 ```
 
-## Running the Project
+> If your actual folder is still named `Achivements` instead of `Achievements`, keep the README path consistent with the current project until you rename the component.
 
-### 1. Start the backend
+---
 
-From the backend directory:
+## Current Limitations
 
-```bash
-cd backend
-go mod download
-go run main.go
-```
+This project is primarily intended for learning and currently has some limitations:
 
-This starts the API on port 8000.
+* Goals are currently UI/demo functionality and are not persisted in the database.
+* Achievements are currently static/demo content.
+* There are no dedicated backend APIs for goals or achievements.
+* The application currently expects the backend and MySQL database to run locally.
+* CORS is currently configured only for `http://localhost:3000`.
+* Production deployment configuration has not been added.
+* Error handling and validation can be improved further.
+* The application does not currently include automated tests.
 
-### 2. Start the frontend
+---
 
-From the frontend directory:
+## Future Improvements
 
-```bash
-cd frontend
-npm install
-npm start
-```
+Potential improvements include:
 
-This starts the React app on http://localhost:3000.
+* Add persistent goal management.
+* Add an achievements system based on user activity.
+* Add activity editing and deletion.
+* Add activity categories and workout types.
+* Add dashboard statistics and charts.
+* Add pagination for activity history.
+* Improve loading and error states.
+* Add protected frontend routes.
+* Improve authentication and authorization.
+* Add automated backend and frontend tests.
+* Add API documentation.
+* Add Docker support.
+* Add production deployment configuration.
 
-## Notes on the Current Implementation
+---
 
-- The frontend and backend are configured to run together locally and expect a MySQL database to be available.
-- The JWT token is stored in a cookie named jwt and sent with credentials in requests.
-- Some UI sections such as Goals and Achievements are present but do not yet have matching backend storage or APIs; they appear as static/demo screens.
-- The app is using CORS to allow requests from http://localhost:3000 only.
+## Learning Objectives
 
-## Important Runtime Behavior
+This project was created as a personal learning project on **June 24, 2024**.
 
-- The backend uses `app.Use(cors.New(cors.Config{ AllowOrigins: "http://localhost:3000", AllowCredentials: true }))` in [backend/main.go](backend/main.go).
-- The frontend calls the backend using Axios with `withCredentials: true` for authenticated requests.
-- If the backend is not running or MySQL is unavailable, the app will fail at runtime during API calls or startup.
+The main goals were to practice:
+
+* Go backend development
+* Fiber
+* REST APIs
+* GORM
+* MySQL
+* JWT authentication
+* Password hashing
+* React
+* React Router
+* Axios
+* Frontend/backend integration
+* Authentication flows
+* CRUD-style application development
+
+---
+
+## License
+
+This project is a personal learning project.
+
+A license can be added if the project is later intended for reuse, modification, or distribution.
