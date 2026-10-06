@@ -1,0 +1,47 @@
+.bg-holder-signup{
+    position: fixed;
+    width: 50%;
+    min-height: 100%;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  .signup-content{
+    position: absolute;
+    width: 50%;
+    right: 0; 
+    bottom: 60%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  .log-form{
+    position: absolute;
+    width: 50%;
+    right: 20%; 
+    align-content: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  .signup-btn1{
+    margin-left: 50px;
+    margin-right: 20px;
+    background-color: rgb(27, 177, 94);
+  }
+
+  .signup-btn2{
+    background-color: rgb(238, 74, 83);
+  }
+
+  .err {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: #e64646;
+  }
+  

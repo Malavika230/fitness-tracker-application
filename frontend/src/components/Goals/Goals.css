@@ -1,0 +1,56 @@
+.goals {
+  color: rgb(80, 38, 114);
+}
+
+.goal-btn {
+  background-color: rgb(255, 255, 255);
+  border-color: rgb(80, 42, 113);
+  transition: background-color 0.3s;
+  color: rgb(80, 42, 113);
+}
+
+.goal-btn:hover {
+  background-color: rgb(102, 53, 141);
+  color: white;
+}
+
+.submit-btn {
+  background-color: rgb(102, 53, 141);
+  border: none;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: rgb(80, 42, 113);
+}
+
+.form-group {
+  color: #333;
+  width: 50%;
+  padding: 0 8px;
+  margin: 0 0 15px;
+  display: inline-block;
+}
+
+.form-group:nth-child(4) {
+  margin-bottom: 30px;
+}
+
+.form-group label {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+
+@media only screen and (max-width:479px) {
+  .form-group {
+    width: 100%;
+    margin: 0 10px 15px;
+  }
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}

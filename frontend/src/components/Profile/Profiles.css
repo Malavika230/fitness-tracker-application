@@ -1,0 +1,41 @@
+
+.profile {
+    color:rgb(80, 38, 114);
+  }
+
+  .profile-container {
+    margin-top: 100px;
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    margin-bottom: 30px;
+    color: rgb(102, 53, 141);
+}
+
+.submit-btn {
+    background-color: rgb(102, 53, 141);
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+    background-color: rgb(80, 42, 113);
+}
+
+.pf{
+    width: 90%;
+}
+  
+.edit-button{
+    background-color: rgb(102, 53, 141) ;
+    position: absolute;
+    left: 510px;
+    bottom: 125px;
+    border-radius: 5px;
+    border: none;
+}

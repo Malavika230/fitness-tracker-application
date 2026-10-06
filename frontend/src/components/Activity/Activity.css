@@ -1,0 +1,77 @@
+.activity {
+  color: rgb(80, 38, 114);
+}
+
+.activity-btn {
+  background-color: rgb(255, 255, 255);
+  border-color: rgb(80, 42, 113);
+  transition: background-color 0.3s;
+  color: rgb(80, 42, 113);
+}
+
+.activity-btn:hover {
+  background-color: rgb(102, 53, 141);
+  color: white;
+}
+
+.submit-btn {
+  background-color: rgb(102, 53, 141);
+  border: none;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: rgb(80, 42, 113);
+}
+
+.form-group {
+  color: #333;
+  width: 50%;
+  padding: 0 8px;
+  margin: 0 0 15px;
+  display: inline-block;
+}
+
+.form-group:nth-child(4) {
+  margin-bottom: 30px;
+}
+
+.form-group label {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+
+@media only screen and (max-width:479px) {
+  .form-group {
+    width: 100%;
+    margin: 0 10px 15px;
+  }
+}
+
+.table-container {
+  padding: 0 300px 0 25px;
+}
+
+.table {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+.table th, .table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+  border-collapse: collapse;
+}
+
+.table th {
+  background-color: rgb(180, 137, 216); /* Light gray background for header cells */
+}
+
+
+
